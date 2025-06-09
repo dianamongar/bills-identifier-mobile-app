@@ -3,6 +3,8 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bills_identifier/providers/detection_provider.dart';
+import 'package:provider/provider.dart';
 import '../models/prediction.dart';
 import '../services/prediction_service.dart';
 import 'prediction_overlay.dart';
@@ -70,6 +72,12 @@ class _CameraViewState extends State<CameraView> {
           if (mounted) {
             setState(() => _predictions = predictions);
           }
+          // Actualizar el estado del provider con la primera predicción
+          if (predictions.isNotEmpty) {
+                final predictedLabel = predictions.first.className;
+                Provider.of<DetectionProvider>(context, listen: false)
+                    .updateDetection(predictedLabel);
+              }
         } catch (e) {
           debugPrint('Error procesando frame: $e');
         }
