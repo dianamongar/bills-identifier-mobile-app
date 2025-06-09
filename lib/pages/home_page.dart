@@ -14,13 +14,23 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 1; // cámara en el centro
 
+
   final List<Widget> _tabs = const [
     GalleryTab(),
     CameraTab(),
-
     SettingsTab(),
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
   void _onTabTapped(int index) {
     setState(() {
       _selectedIndex = index;
