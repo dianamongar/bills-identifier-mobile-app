@@ -9,7 +9,13 @@ class TTSService {
     await _tts.setSpeechRate(0.5);
   }
 
-  static Future<void> speak(String text) async {
+  static Future<void> speak(String text, {Function()? onComplete}) async {
+    _tts.setCompletionHandler(() {
+      if (onComplete != null) {
+        onComplete();
+      }
+    });
+
     await _tts.speak(text);
   }
 

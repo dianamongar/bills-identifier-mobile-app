@@ -7,7 +7,7 @@ import '../models/prediction.dart';
 class PredictionService {
   final String apiUrl;
 
-  PredictionService({this.apiUrl = 'http://192.168.0.50:8000/predict/'});
+  PredictionService({this.apiUrl = 'http://192.168.0.50:8000/predict/'});//TODO cambiar por la IP del servidor
 
   Future<List<Prediction>> sendImageBytesForPrediction(Uint8List imageBytes) async {
   final request = http.MultipartRequest('POST', Uri.parse(apiUrl));

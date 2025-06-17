@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bills_identifier/services/tts_service.dart';
+import 'package:flutter_bills_identifier/widgets/speech_overlay.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:provider/provider.dart';
 import 'package:speech_to_text/speech_to_text.dart';
@@ -12,6 +13,9 @@ class SpeechService with WidgetsBindingObserver {
   bool _isAvailable = false;
   bool _isListening = false;
   BuildContext? _context;
+  OverlayEntry? _overlayEntry;
+  String _currentText = '';
+
 
   Future<void> initSpeech(BuildContext context) async {
     _context = context;
@@ -33,6 +37,7 @@ class SpeechService with WidgetsBindingObserver {
 
   void startListening() {
     if (_isAvailable && !_isListening && _context != null) {
+      _showOverlay();
       final options = stt.SpeechListenOptions(
         listenMode: ListenMode.confirmation,
         partialResults: true
@@ -43,6 +48,7 @@ class SpeechService with WidgetsBindingObserver {
         onResult: (result) {
           final text = result.recognizedWords.toLowerCase();
           debugPrint('🗣️ Texto detectado: $text');
+          _updateOverlayText(text);
 
           if (text.contains("último valor")) {
             final detection = _context!.read<DetectionProvider>();
@@ -50,7 +56,12 @@ class SpeechService with WidgetsBindingObserver {
               detection.lastValue,
               detection.detectionTime,
             );
-            TTSService.speak(message);
+            TTSService.speak(
+              message,
+              onComplete: () {
+                _removeOverlay();
+              },
+            );
           }
         },
       );
@@ -61,13 +72,30 @@ class SpeechService with WidgetsBindingObserver {
   void stopListening() {
     _speech.stop();
     _isListening = false;
+    _removeOverlay();
   }
 
-  // void _restartListening() async {
-  //   _isListening = false;
-  //   await Future.delayed(const Duration(milliseconds: 300));
-  //   startListening();
-  // }
+  void _showOverlay() {
+    if (_context == null || _overlayEntry != null) return;
+
+    final overlay = Overlay.of(_context!);
+    _overlayEntry = OverlayEntry(
+      builder: (_) => SpeechOverlay(recognizedText: _currentText),
+    );
+
+    overlay.insert(_overlayEntry!);
+  }
+
+  void _updateOverlayText(String text) {
+    _currentText = text;
+    _overlayEntry?.markNeedsBuild(); // Redibuja el overlay
+  }
+
+  void _removeOverlay() {
+    _currentText = '';
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
 
   /// Si la app va a segundo plano, detiene. Al volver, reanuda.
   @override
