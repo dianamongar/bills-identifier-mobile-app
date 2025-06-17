@@ -15,6 +15,7 @@ class SpeechService with WidgetsBindingObserver {
 
   Future<void> initSpeech(BuildContext context) async {
     _context = context;
+    TTSService.init();
     WidgetsBinding.instance.addObserver(this); // ← escucha cambios de estado de la app
 
     _isAvailable = await _speech.initialize(
