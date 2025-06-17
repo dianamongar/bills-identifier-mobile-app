@@ -20,19 +20,14 @@ class SpeechService with WidgetsBindingObserver {
     _isAvailable = await _speech.initialize(
       onStatus: (status) {
         debugPrint('🔊 Speech status: $status');
-        if (status == 'done' || status == 'notListening') {
-          _restartListening();
-        }
+        _isListening = status == 'listening';
       },
       onError: (error) {
         debugPrint('⚠️ Speech error: $error');
-        _restartListening();
+        _isListening = false;
       },
     );
 
-    if (_isAvailable) {
-      startListening();
-    }
   }
 
   void startListening() {
@@ -67,11 +62,11 @@ class SpeechService with WidgetsBindingObserver {
     _isListening = false;
   }
 
-  void _restartListening() async {
-    _isListening = false;
-    await Future.delayed(const Duration(milliseconds: 300));
-    startListening();
-  }
+  // void _restartListening() async {
+  //   _isListening = false;
+  //   await Future.delayed(const Duration(milliseconds: 300));
+  //   startListening();
+  // }
 
   /// Si la app va a segundo plano, detiene. Al volver, reanuda.
   @override
@@ -81,8 +76,8 @@ class SpeechService with WidgetsBindingObserver {
       debugPrint("📴 App en segundo plano. Deteniendo escucha...");
       stopListening();
     } else if (state == AppLifecycleState.resumed) {
-      debugPrint("📲 App activa. Reiniciando escucha...");
-      _restartListening();
+      // debugPrint("📲 App activa. Reiniciando escucha...");
+      // _restartListening();
     }
   }
 

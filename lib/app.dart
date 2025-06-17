@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Flutter Bills Identifier',
         debugShowCheckedModeBanner: false,
-        home: const AppWrapper(), // 👈 usa un wrapper con initState
+        home: const AppWrapper(), 
       ),
     );
   }
